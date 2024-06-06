@@ -1,101 +1,66 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<time.h>
+#include<stdlib.h>
 
-#define MAX 5
-
-struct Queue {
-    int front, rear;
-    int calls[MAX];
-};
-
-void initializeQueue(struct Queue *q){
-    q->front = q->rear = -1;
+int partition(int a[],int low,int high)
+{
+	int i,j,temp,pivot;
+	pivot=a[low];
+	i=low+1;
+	j=high;
+	while(1)
+	{
+		while(i<high&&a[i]<=pivot)
+		i++;
+		while(a[j]>pivot)
+		j--;
+		if(i<j)
+		{
+			temp=a[i];
+			a[i]=a[j];
+			a[j]=temp;
+		}
+		else
+		{
+			temp=a[j];
+			a[j]=a[low];
+			a[low]=temp;
+			return j;
+		}
+	}
 }
 
-int isFull(struct Queue *q) {
-    return (q->front == (q->rear + 1) % MAX);
+void quick_sort(int a[],int low,int high)
+{
+	int j;
+	if(low<high)
+	{
+		j=partition(a,low,high);
+		quick_sort(a,low,j-1);
+		quick_sort(a,j+1,high);
+	}
 }
 
-int isEmpty(struct Queue *q) {
-    return (q->front == -1);
-}
-
-void enqueue(struct Queue *q, int call) {
-    if (isFull(q)) {
-        printf("Overflow: Queue is full. Cannot add more calls.\n");
-    } else {
-        if (isEmpty(q)) {
-            q->front = q->rear = 0;
-        } else {
-            q->rear = (q->rear + 1) % MAX;
-        }
-        q->calls[q->rear] = call;
-        printf("Call added successfully.\n");
+int main()
+{
+	int i, n,a[200000];
+    double clk;
+    clock_t starttime,endtime;
+	printf("Enter the number of students records: \n");
+	scanf("%d",&n);
+    for(i=0;i<n;i++) 
+    {
+        a[i]=rand()%100;
+        printf("\nThe roll numbers are %d\n",a[i]);
     }
-}
-
-void dequeue(struct Queue *q) {
-    if (isEmpty(q)) {
-        printf("Underflow: Queue is empty. No calls to remove.\n");
-    } else {
-        printf("Call %d removed.\n", q->calls[q->front]);
-        if (q->front == q->rear) {
-            initializeQueue(q);
-        } else {
-            q->front = (q->front + 1) % MAX;
-        }
-    }
-}
-
-void displayQueue(struct Queue *q) {
-    if (isEmpty(q)) {
-        printf("Queue is empty.\n");
-    } else {
-        printf("Current status of calls: ");
-        
-        do {
-            printf("%d \n ", q->calls[q->front]);
-            q->front = (q->front + 1) % MAX;
-        } while (q->front != (q->rear + 1) % MAX);
-        printf("\n");
-    }
-}
-
-int main() {
-    struct Queue callQueue;
-    initializeQueue(&callQueue);
-
-    int choice, call;
-
-    do {
-        printf("\n----- Call Center Simulation -----\n");
-        printf("1. Add a call\n");
-        printf("2. Delete a call\n");
-        printf("3. Display current status of calls\n");
-        printf("4. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
-
-        switch (choice) {
-            case 1:
-                printf("Enter the call number: ");
-                scanf("%d", &call);
-                enqueue(&callQueue, call);
-                break;
-            case 2:
-                dequeue(&callQueue);
-                break;
-            case 3:
-                displayQueue(&callQueue);
-                break;
-            case 4:
-                printf("Exiting the program.\n");
-                break;
-            default:
-                printf("Invalid choice. Please try again.\n");
-        }
-
-    } while (choice != 4);
-
+    starttime=clock();
+	quick_sort(a,0,n-1);
+    endtime=clock();
+    clk=(double)(endtime-starttime)/CLOCKS_PER_SEC;
+	printf("\nSorted roll numbers are: \n");
+	for(i=0;i<n;i++)
+	printf("\t%d",a[i]);
+    printf("\nThe run time is %f\n",clk);
     return 0;
 }
+
